@@ -19,11 +19,16 @@ interface CreateBookingBody {
   durationId?: string;
 }
 
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 export async function createBooking(req: Request, res: Response) {
   const body = req.body as CreateBookingBody;
 
   if (!body.propertyId || !body.guest?.name || !body.guest?.email || !body.guest?.phone || !body.guests) {
     return res.status(400).json({ error: "Missing required booking fields." });
+  }
+  if (!EMAIL_RE.test(body.guest.email.trim())) {
+    return res.status(400).json({ error: "Please enter a valid email address." });
   }
 
   const property = await Property.findById(body.propertyId);
@@ -122,8 +127,18 @@ export async function createBooking(req: Request, res: Response) {
   } catch (err) {
     if (err instanceof PricingError) return res.status(422).json({ error: err.message });
     if (err instanceof AvailabilityError) return res.status(409).json({ error: err.message });
+    if (err instanceof Error && err.name === "CastError") {
+      return res.status(400).json({ error: "That property reference doesn't look valid. Please refresh the page and try again." });
+    }
     console.error("createBooking failed:", err);
-    return res.status(500).json({ error: "Could not create booking. Please try again." });
+    // TEMPORARY: include the real error message in the response so it's
+    // visible straight in the browser's Network tab while we're diagnosing
+    // this — remove the `detail` field once the root cause is confirmed and
+    // fixed, since it's not something a guest-facing API should normally leak.
+    return res.status(500).json({
+      error: "Could not create booking. Please try again.",
+      detail: err instanceof Error ? `${err.name}: ${err.message}` : String(err),
+    });
   }
 }
 

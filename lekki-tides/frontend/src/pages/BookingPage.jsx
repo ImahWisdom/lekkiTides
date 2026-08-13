@@ -27,9 +27,18 @@ const FONT_IMPORT =
   "@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,500;0,600;1,500&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap');";
 
 const money = (n) => "₦" + Math.round(n || 0).toLocaleString("en-NG");
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const MS_DAY = 86400000;
-const ANCHOR = new Date(2026, 6, 9); // Thu Jul 9 2026 — "today" for this demo
+// "Today" for the date strip and availability window. This must be the
+// actual current date — guests are booking real dates, not a fixed demo
+// value. Zeroed to midnight so date comparisons (sameDay, weekend checks)
+// stay consistent regardless of what time of day the page loads.
+const ANCHOR = (() => {
+  const d = new Date();
+  d.setHours(0, 0, 0, 0);
+  return d;
+})();
 
 function addDays(d, n) {
   return new Date(d.getTime() + n * MS_DAY);
@@ -313,7 +322,9 @@ export default function BookingPage() {
   const balance = subtotal - deposit;
   const hasSelection = mode === "shortlet" ? nights > 0 : !!boatDate && !!duration;
   const canPrice = hasSelection && !overCapacity && subtotal > 0;
-  const hasGuestInfo = guestInfo.name.trim() && guestInfo.email.trim() && guestInfo.phone.trim();
+  const emailTrimmed = guestInfo.email.trim();
+  const emailLooksInvalid = emailTrimmed.length > 0 && !EMAIL_RE.test(emailTrimmed);
+  const hasGuestInfo = guestInfo.name.trim() && emailTrimmed && !emailLooksInvalid && guestInfo.phone.trim();
   const readyToPay = canPrice && hasGuestInfo && !redirectUrl;
 
   const missingStepMessage = (() => {
@@ -325,6 +336,7 @@ export default function BookingPage() {
       return "Pick a trip duration to continue.";
     }
     if (mode === "shortlet" && start && !end) return "Now pick a check-out date.";
+    if (emailLooksInvalid) return "That email address doesn't look right — please double-check it.";
     if (!hasGuestInfo) return "Add your name, email and WhatsApp number to continue.";
     return null;
   })();
@@ -620,13 +632,19 @@ export default function BookingPage() {
                 onChange={(e) => setGuestInfo((g) => ({ ...g, name: e.target.value }))}
                 className="rounded-xl border border-[#E3DBC9] bg-white px-3.5 py-2.5 text-sm text-[#12262A] outline-none focus:border-[#0B3D3C]"
               />
-              <input
-                type="email"
-                placeholder="Email"
-                value={guestInfo.email}
-                onChange={(e) => setGuestInfo((g) => ({ ...g, email: e.target.value }))}
-                className="rounded-xl border border-[#E3DBC9] bg-white px-3.5 py-2.5 text-sm text-[#12262A] outline-none focus:border-[#0B3D3C]"
-              />
+              <div>
+                <input
+                  type="email"
+                  placeholder="Email"
+                  value={guestInfo.email}
+                  onChange={(e) => setGuestInfo((g) => ({ ...g, email: e.target.value }))}
+                  className={
+                    "w-full rounded-xl border bg-white px-3.5 py-2.5 text-sm text-[#12262A] outline-none " +
+                    (emailLooksInvalid ? "border-[#D9765A] focus:border-[#D9765A]" : "border-[#E3DBC9] focus:border-[#0B3D3C]")
+                  }
+                />
+                {emailLooksInvalid && <p className="text-[11px] text-[#993C1D] mt-1">Doesn't look like a valid email.</p>}
+              </div>
               <input
                 type="tel"
                 placeholder="WhatsApp number"

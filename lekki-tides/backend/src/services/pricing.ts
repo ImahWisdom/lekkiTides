@@ -22,6 +22,14 @@ function finalize(lineItems: LineItem[]): PricingBreakdown {
 
 export class PricingError extends Error {}
 
+function assertNotInPast(startDateTime: Date, label: string): void {
+  const todayStart = new Date();
+  todayStart.setHours(0, 0, 0, 0);
+  if (startDateTime < todayStart) {
+    throw new PricingError(`${label} can't be in the past.`);
+  }
+}
+
 export function priceShortletStay(
   property: PropertyDoc,
   startDateTime: Date,
@@ -33,6 +41,7 @@ export function priceShortletStay(
   if (!cfg || !cfg.weekdayRate || !cfg.weekendRate || !cfg.maxGuests || !cfg.includedGuests) {
     throw new PricingError("Property is missing shortlet pricing configuration.");
   }
+  assertNotInPast(startDateTime, "Check-in date");
 
   const nights = Math.round((endDateTime.getTime() - startDateTime.getTime()) / MS_DAY);
   if (nights < (cfg.minNights ?? 1)) {
@@ -92,6 +101,7 @@ export function priceBoatTrip(
   if (!cfg || !cfg.capacity || !cfg.includedGuests || !cfg.durations?.length) {
     throw new PricingError("Property is missing boat pricing configuration.");
   }
+  assertNotInPast(startDateTime, "Trip date");
   const duration = cfg.durations.find((d) => d.id === durationId);
   if (!duration) throw new PricingError("Unknown duration option for this boat.");
   if (guests > cfg.capacity) {
@@ -123,3 +133,4 @@ export function priceBoatTrip(
   const endDateTime = new Date(startDateTime.getTime() + duration.hours * 3600000);
   return { breakdown: finalize(lineItems), endDateTime };
 }
+
