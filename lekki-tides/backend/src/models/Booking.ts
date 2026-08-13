@@ -8,7 +8,7 @@ const lineItemSchema = new Schema(
 const paymentSchema = new Schema(
   {
     type: { type: String, enum: ["deposit", "balance"], required: true },
-    reference: { type: String, required: true, unique: true },
+    reference: { type: String, required: true, unique: true, sparse: true },
     amount: { type: Number, required: true }, // NGN, not kobo
     status: { type: String, enum: ["initiated", "success", "failed"], default: "initiated" },
     authorizationUrl: { type: String },

@@ -131,14 +131,7 @@ export async function createBooking(req: Request, res: Response) {
       return res.status(400).json({ error: "That property reference doesn't look valid. Please refresh the page and try again." });
     }
     console.error("createBooking failed:", err);
-    // TEMPORARY: include the real error message in the response so it's
-    // visible straight in the browser's Network tab while we're diagnosing
-    // this — remove the `detail` field once the root cause is confirmed and
-    // fixed, since it's not something a guest-facing API should normally leak.
-    return res.status(500).json({
-      error: "Could not create booking. Please try again.",
-      detail: err instanceof Error ? `${err.name}: ${err.message}` : String(err),
-    });
+    return res.status(500).json({ error: "Could not create booking. Please try again." });
   }
 }
 
