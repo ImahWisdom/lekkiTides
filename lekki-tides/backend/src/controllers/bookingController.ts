@@ -76,7 +76,7 @@ export async function createBooking(req: Request, res: Response) {
         startDateTime,
         endDateTime,
         depositDue: booking.pricing!.deposit,
-        viewBookingUrl: `${process.env.APP_BASE_URL ?? "http://localhost:5173"}/booking/${booking.bookingRef}`,
+        viewBookingUrl: `${process.env.APP_BASE_URL ?? "http://localhost:5173"}/#/booking/${booking.bookingRef}`,
       }).catch((err) => console.error("Reference email failed:", err));
 
       return res.status(201).json({ booking });
@@ -120,7 +120,7 @@ export async function createBooking(req: Request, res: Response) {
       startDateTime,
       endDateTime,
       depositDue: booking.pricing!.deposit,
-      viewBookingUrl: `${process.env.APP_BASE_URL ?? "http://localhost:5173"}/booking/${booking.bookingRef}`,
+      viewBookingUrl: `${process.env.APP_BASE_URL ?? "http://localhost:5173"}/#/booking/${booking.bookingRef}`,
     }).catch((err) => console.error("Reference email failed:", err));
 
     return res.status(201).json({ booking });

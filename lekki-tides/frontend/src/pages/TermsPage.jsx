@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import Nav from "../components/Nav";
 import Footer from "../components/Footer";
 import { usePageMeta } from "../lib/usePageMeta";
@@ -51,7 +52,7 @@ export default function TermsPage() {
           <section>
             <h2 className="font-display text-lg font-semibold text-[#12262A] mb-2">5. Cancellations and refunds</h2>
             <p>
-              See our separate <a href="/cancellation-policy" className="underline text-[#0B3D3C]">Cancellation &amp; Refund Policy</a> for the rules on
+              See our separate <Link to="/cancellation-policy" className="underline text-[#0B3D3C]">Cancellation &amp; Refund Policy</Link> for the rules on
               cancelling, rescheduling, and refund timing.
             </p>
           </section>

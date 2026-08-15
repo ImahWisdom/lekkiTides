@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { HashRouter, Routes, Route, useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import HomePage from "./pages/HomePage";
 import PropertyListingPage from "./pages/PropertyListingPage";
@@ -25,7 +25,7 @@ function ScrollToTop() {
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <HashRouter>
       <ScrollToTop />
       <Routes>
         <Route path="/" element={<HomePage />} />
@@ -38,6 +38,7 @@ export default function App() {
         <Route path="/privacy" element={<PrivacyPage />} />
         <Route path="/cancellation-policy" element={<CancellationPolicyPage />} />
       </Routes>
-    </BrowserRouter>
+    </HashRouter>
   );
 }
+

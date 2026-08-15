@@ -39,7 +39,7 @@ export async function initiatePayment(req: Request, res: Response) {
       email: booking.guest!.email,
       amountNaira,
       reference: paymentReference,
-      callbackUrl: `${process.env.APP_BASE_URL ?? "http://localhost:5173"}/booking/${booking.bookingRef}`,
+      callbackUrl: `${process.env.APP_BASE_URL ?? "http://localhost:5173"}/#/booking/${booking.bookingRef}`,
       metadata: { bookingRef: booking.bookingRef, type },
     });
 
@@ -108,7 +108,7 @@ async function verifyAndApplyPayment(reference: string): Promise<{ status: strin
       amountPaid: booking.pricing!.deposit,
       balanceDue: booking.pricing!.balance,
       mapsUrl,
-      viewBookingUrl: `${process.env.APP_BASE_URL ?? "http://localhost:5173"}/booking/${booking.bookingRef}`,
+      viewBookingUrl: `${process.env.APP_BASE_URL ?? "http://localhost:5173"}/#/booking/${booking.bookingRef}`,
     }).catch((err) => console.error("Confirmation email failed:", err));
   }
 
